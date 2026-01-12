@@ -1,4 +1,4 @@
-# Design Doc: Project EigenWeb (PageRank Implementation)
+# Design Doc: PageRank Implementation
 
 ## 0. Overview
 
@@ -42,7 +42,7 @@ We will design this as a **Stream Processing Engine**. We assume the graph might
 Let's build it in go!
 
 ```text
-/project-eigenweb
+/pagerank
 ├── /data                # Place your toy graphs here (web-Stanford.txt, etc.)
 ├── /docs                # Your diagrams and notes
 ├── /src
@@ -77,14 +77,13 @@ This is where the magic happens. You cannot store a matrix for the web; it's mos
 * *Challenge:* This can get huge. Efficient string hashing is key.
 
 
-2. **Compressed Sparse Row (CSR) Format:**
-* Instead of a 2D array, use three 1D arrays to represent the graph:
-* `values[]`: The weights (usually ).
-* `column_indices[]`: Who the link points to.
-* `row_ptr[]`: Where each node's outgoing links start.
-
-
-* *Why:* Extremely cache-friendly for CPU pre-fetching.
+2. **Compressed Sparse Row (CSR) Format (representing the Reverse Graph):**
+* To enable lock-free parallel writing to the `next_ranks` vector, we need to know who points *to* a node (Incoming Links).
+* Therefore, our CSR structure will effectively store the **Transpose** of the web graph:
+    * `values[]`: The weights (usually $1.0 / \text{out\_degree}(\text{source})$).
+    * `column_indices[]`: The **Source** node IDs (who links *to* the current row).
+    * `row_ptr[]`: Index range for a node's **Incoming** links.
+* *Why:* This allows Thread $T$ to own nodes $0..N$, iterate their incoming neighbors, and write results safely without mutexes.
 
 
 3. **The Rank Vectors (Double Buffering):**
