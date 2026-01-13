@@ -57,9 +57,7 @@ func (e *PageRankEngine) Step() ([]float64, float64) {
 	// Iterate over nextRanks and apply the formula
 	for i := range nextRanks {
 		// --- YOUR CODE HERE ---
-		// nextRanks[i] = ...
-		_ = i // remove this when you code
-		_ = auxiliaryConstant 
+		nextRanks[i] = auxiliaryConstant + e.DampingFactor * incomingRanks[i]
 	}
 
 	// 3. Calculate Convergence Delta (L1 Norm)

@@ -60,6 +60,15 @@ func (m *CSRMatrix) Multiply(v []float64) []float64 {
 	//    c. Add (weight * v[sourceNode]) to result[i].
 	
 	// --- YOUR CODE HERE ---
+
+	for i := 0; i < m.Rows; i++ {
+		start, end := m.RowPtrs[i], m.RowPtrs[i + 1]
+		for k := start; k < end; k++ {
+			sourceNode := m.ColumnIndices[k]
+			weight := m.Values[k]
+			result[i] += weight * v[sourceNode]
+		}
+	}
 	
 	return result
 }

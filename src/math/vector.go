@@ -26,6 +26,10 @@ func L1Difference(v1, v2 []float64) float64 {
 	_ = math.Abs(0)
 
 	// --- YOUR CODE HERE ---
+	for i, v1_val := range v1 {
+		v2_val := v2[i]
+		diff += math.Abs(v1_val - v2_val)
+	}
 
 	return diff
 }
